@@ -1,7 +1,7 @@
 import { styled } from "@/styles"
 
 const Button = styled('button', {
-  backgroundColor: '$black',
+  backgroundColor: '$green500',
   borderRadius: 8,
   border: 0,
   padding: '4px 8px',
@@ -12,7 +12,7 @@ const Button = styled('button', {
 
   span: {
     fontWeight: 'bold',
-    color: 'White'
+    color: '$white'
   },
 
 
