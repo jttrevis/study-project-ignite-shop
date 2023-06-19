@@ -2,7 +2,7 @@ import { styled } from "..";
 
 export const ProductContainer = styled('main', {
   display: 'grid',
-  gridTemplateColumnsL: '1fr 1fr',
+  gridTemplateColumns: '1fr 1fr',
   alignItems: 'stretch',
   gap: '4rem',
 
