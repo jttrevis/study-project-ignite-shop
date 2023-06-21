@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { ImageContainer, ProductContainer, ProductDetails } from '@/styles/pages/product'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import Image from 'next/image'
+import axios from 'axios'
 
 interface ProductProps{
   product: {
@@ -13,10 +14,30 @@ interface ProductProps{
     imageUrl: string
     price: string
     description: string
+    defaultPriceId: string
   }
 }
 
-const product = ({product} : ProductProps) => {
+const Product = ({product} : ProductProps) => {
+  const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false)
+
+  async function handleBuyProduct(){
+    try {
+      setIsCreatingCheckoutSession(true)
+      const response = await axios.post('/api/checkout', {
+        priceId: product.defaultPriceId,
+      })
+
+      const { checkoutUrl } = response.data
+
+      window.location.href = checkoutUrl
+    } catch (error) {
+      alert('Error processing purchase request from stripe: ' + error)
+      setIsCreatingCheckoutSession(false)
+
+    }
+    
+  }
 
   return (
     <ProductContainer>
@@ -31,13 +52,13 @@ const product = ({product} : ProductProps) => {
 
         <p>{product.description}</p>
 
-        <button>Buy Now</button>
+        <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>Buy Now</button>
       </ProductDetails>
     </ProductContainer>
   )
 }
 
-export default product
+export default Product
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
@@ -56,7 +77,7 @@ export const getStaticProps: GetStaticProps<any, {id: string}> = async ({ params
   })
 
   const price = product.default_price as Stripe.Price;
-  
+  const unitAmount = price.unit_amount ?? 0;
   return {
     props: {
       product: {
@@ -66,8 +87,9 @@ export const getStaticProps: GetStaticProps<any, {id: string}> = async ({ params
         price: new Intl.NumberFormat("en-GB", {
           style: "currency",
           currency: "GBP",
-        }).format(price.unit_amount / 100),
+        }).format(unitAmount/ 100),
         description: product.description,
+        defaultPriceId: price.id
       }
     },
     revalidate: 60 * 60 * 1

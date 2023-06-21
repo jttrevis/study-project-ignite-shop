@@ -31,7 +31,7 @@ interface HomeProps {
     id: string;
     name: string;
     imageUrl: string;
-    price: string;
+    price: string 
   }[];
 }
 
@@ -74,6 +74,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const products = response.data.map((product) => {
     const price = product.default_price as Stripe.Price;
+    const unitAmount = price.unit_amount ?? 0;
     return {
       id: product.id,
       name: product.name,
@@ -81,7 +82,7 @@ export const getStaticProps: GetStaticProps = async () => {
       price: new Intl.NumberFormat("en-GB", {
         style: "currency",
         currency: "GBP",
-      }).format(price.unit_amount / 100),
+      }).format(unitAmount / 100),
     };
   });
 
