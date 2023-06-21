@@ -6,6 +6,7 @@ import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import Image from 'next/image'
 import axios from 'axios'
+import Head from 'next/head'
 
 interface ProductProps{
   product: {
@@ -40,6 +41,10 @@ const Product = ({product} : ProductProps) => {
   }
 
   return (
+    <>
+    <Head>
+        <title>{product.name}</title>
+    </Head>
     <ProductContainer>
       <ImageContainer>
         <Image  width={520} height={480} alt='' src={product.imageUrl}/>
@@ -55,6 +60,7 @@ const Product = ({product} : ProductProps) => {
         <button disabled={isCreatingCheckoutSession} onClick={handleBuyProduct}>Buy Now</button>
       </ProductDetails>
     </ProductContainer>
+    </>
   )
 }
 
@@ -74,7 +80,7 @@ export const getStaticProps: GetStaticProps<any, {id: string}> = async ({ params
       notFound: true,
     }
   }
-  const prductId = params.id
+  const prductId = params?.id
 
   const product = await stripe.products.retrieve(prductId, {
     expand: ['default_price']
